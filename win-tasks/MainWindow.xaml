@@ -1,0 +1,125 @@
+﻿<Window x:Class="win_tasks.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:win_tasks"
+        xmlns:components="clr-namespace:win_tasks.components"
+        xmlns:behaviors="clr-namespace:win_tasks.behaviors"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        FontSize="14">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <materialDesign:ColorZone
+                  Padding="16"
+                  Mode="PrimaryMid" CornerRadius="5">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                    Margin="16,0,10 ,0"
+                    VerticalAlignment="Center"
+                    Text="Liste" />
+                <materialDesign:ColorZone
+                        Margin="16,0,0,0"
+                        Padding="8,4,8,4"
+                        Panel.ZIndex="1"
+                        materialDesign:ElevationAssist.Elevation="Dp2"
+                        CornerRadius="2"
+                        Mode="Standard">
+                    <ComboBox Name="cb_List" ItemsSource="{Binding TaskLists}" SelectedItem="{Binding CurrentList}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Title}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </materialDesign:ColorZone>
+            </StackPanel>
+        </materialDesign:ColorZone>
+
+        <Grid Grid.Row="1" >
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="8*"/>
+                    <ColumnDefinition Width="3*" MinWidth="200"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TreeView ItemsSource="{Binding CurrentList.Tasks}" MouseLeftButtonUp="Task_MouseUp" Margin="0 10 10 10">
+                    <materialDesign:TreeViewAssist.AdditionalTemplate>
+                        <DataTemplate>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Subtasks.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                            <materialDesign:ColorZone CornerRadius="6" Mode="PrimaryMid" HorizontalAlignment="Left" Margin="10 0 0 0">
+                                <TextBlock Margin="8,1,8,1"  FontSize="12"  FontStyle="Italic">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding Subtasks.Count, StringFormat='\{0\} Teilaufgaben'}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Subtasks.Count}" Value="1">
+                                                    <Setter Property="Text" Value="{Binding Subtasks.Count, StringFormat='\{0\} Teilaufgabe'}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </materialDesign:ColorZone>
+                        </DataTemplate>
+                    </materialDesign:TreeViewAssist.AdditionalTemplate>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Subtasks}">
+                            <Grid Margin="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <CheckBox Grid.Column="0" IsChecked="{Binding IsCompleted}" Margin="0 0 5 0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Title}" TextWrapping="Wrap">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCompleted}" Value="true">
+                                                    <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+
+                <materialDesign:Card Grid.RowSpan="2" Grid.Column="1" Margin="0 2 0 0"
+                  Padding="8"
+                  Background="{DynamicResource PrimaryHueLightBrush}"
+                  Foreground="{DynamicResource PrimaryHueLightForegroundBrush}">
+                    <components:TaskDetails DataContext="{Binding CurrentTask}"/>
+                </materialDesign:Card>
+
+                <Button Name="btn_Refresh" Click="btn_Refresh_Click" Content="Neu laden" Grid.Row="1" HorizontalAlignment="Left"/>
+            </Grid>
+            <!--<ListView Grid.Column="0" ItemsSource="{Binding CurrentList.Tasks}" ScrollViewer.CanContentScroll="False" HorizontalContentAlignment="Stretch" Padding="10">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <components:Task MouseUp="Task_MouseUp"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>-->
+
+        </Grid>
+    </Grid>
+</Window>
